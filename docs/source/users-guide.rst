@@ -46,7 +46,7 @@ Table of Contents
    6. `Setting up multiple CAs`_
    7. `Enrolling an intermediate CA`_
    8. `Upgrading the server`_
-   9. `Rotation the root CA signing certificate`_
+   9. `Rotating the root CA signing certificate`_
 
 5. `Fabric CA Client`_
 
@@ -54,7 +54,7 @@ Table of Contents
    2. `Registering a new identity`_
    3. `Enrolling a peer identity`_
    4. `Getting Identity Mixer credential for a user`_
-   5. `Getting Idemix CRI`_
+   5. `Getting Idemix CRI (Certificate Revocation Information)`_
    6. `Reenrolling an identity`_
    7. `Revoking a certificate or identity`_
    8. `Generating a CRL (Certificate Revocation List)`_
@@ -1116,7 +1116,7 @@ To display summary information from the haproxy "show stat" command, the followi
 
 `Back to Top`_
 
-Rotation the root CA signing certificate
+Rotating the root CA signing certificate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Certificates have expiration dates and eventually expire someday. We need a way to update
@@ -1124,6 +1124,7 @@ the CA signing certificates without causing disruption or outage to the network.
 expiration time for Fabric CA signing certificates is as follows:
 
 Root CA certificate: 15 years
+
 Intermediate CA certificate: 5 years
 
 Whether the CA signing cert is issued by Fabric CA or third party entities like Verisign,
@@ -1148,6 +1149,20 @@ signing certificate and private key, the following way:
 
 3) Copy CA cert and private key from <temp config directory> to the running Fabric CA server’s CA
    config directory.
+
+With this method, identities with valid ECerts will not be able to perform any Fabric CA
+requests as soon as new CA cert/key is copied into Fabric CA server’s configuration directory. Such
+identities, will have to use basic authorization (username/password) to enroll again to get a
+new ECert issues signed with the new CA key.
+
+**Rotating in a cluster environment - No HSM**
+1) Bring down one cluster member
+2) Generate new CA certificate key pair (ca-new.pem) on the stopped cluster member
+3) Copy new CA cert and private key to all the other cluster member’s config directory (cert goes into CA config directory and key goes into <CA config dir>/msp/keystore)
+5) Set ca.certfile to the new CA cert (generated in the step2) in the onfiguration files on all cluster members
+6) Restart cluster members one at a time
+
+**Rotating in a cluster environment - HSM**
 
 `Back to Top`_
 
@@ -1516,7 +1531,7 @@ for peer and orderer identities. As before, applications can use a Fabric SDK to
 associated with creating authorization header and request payload, and with processing the response.
 
 Getting Idemix CRI (Certificate Revocation Information)
------------------------------------------------
+--------------------------------------------------------
 An Idemix CRI (Credential Revocation Information) is similar in purpose to an X509 CRL (Certificate Revocation List):
 to revoke what was previously issued.  However, there are some differences.
 
