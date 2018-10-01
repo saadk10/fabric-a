@@ -46,21 +46,22 @@ Table of Contents
    6. `Setting up multiple CAs`_
    7. `Enrolling an intermediate CA`_
    8. `Upgrading the server`_
+   9. `Rotation the root CA signing certificate`_
 
 5. `Fabric CA Client`_
 
    1. `Enrolling the bootstrap identity`_
    2. `Registering a new identity`_
    3. `Enrolling a peer identity`_
-   5. `Getting Identity Mixer credential for a user`_
-   6. `Getting Idemix CRI`_
-   7. `Reenrolling an identity`_
-   8. `Revoking a certificate or identity`_
-   9. `Generating a CRL (Certificate Revocation List)`_
-   10. `Attribute-Based Access Control`_
-   11. `Dynamic Server Configuration Update`_
-   12. `Enabling TLS`_
-   13. `Contact specific CA instance`_
+   4. `Getting Identity Mixer credential for a user`_
+   5. `Getting Idemix CRI`_
+   6. `Reenrolling an identity`_
+   7. `Revoking a certificate or identity`_
+   8. `Generating a CRL (Certificate Revocation List)`_
+   9. `Attribute-Based Access Control`_
+   10. `Dynamic Server Configuration Update`_
+   11. `Enabling TLS`_
+   12. `Contact specific CA instance`_
 
 6. `HSM`_
 
@@ -1115,7 +1116,38 @@ To display summary information from the haproxy "show stat" command, the followi
 
 `Back to Top`_
 
+Rotation the root CA signing certificate
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Certificates have expiration dates and eventually expire someday. We need a way to update
+the CA signing certificates without causing disruption or outage to the network. Default
+expiration time for Fabric CA signing certificates is as follows:
+
+Root CA certificate: 15 years
+Intermediate CA certificate: 5 years
+
+Whether the CA signing cert is issued by Fabric CA or third party entities like Verisign,
+we need a way to update CA certs before they expire without any disruption/outage to the network.
+
+The steps are as follow:
+
+1) Generate or get new CA signing certificate and private key
+2) Add new CA signing certificate to local MSP of all the nodes (peers or orderers) and to the
+   channel MSP of all the channels that organization is a member
+3) Re-issue certificates with the new CA signing certificate or wait for the expiration of all certs
+   signed by the old CA certificate
+4) Remove old CA signing certificate from all the nodes and channels
+
+If Fabric CA is used as the Certificate Authority, one can generate new root/intermediate CA
+signing certificate and private key, the following way:
+
+1) Copy server configuration to a temporary config directory
+2) Run `fabric-ca-server` init using the temporary config directory
+   `fabric-ca-server init –c <temp config directory>/<server config file name> --ca.name <CA Name>`
+3) Copy CA cert and private key from <temp config directory> to the running Fabric CA server’s CA
+   config directory.
+
+`Back to Top`_
 
 .. _client:
 
