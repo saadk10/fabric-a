@@ -1123,8 +1123,8 @@ Certificates have expiration dates and eventually expire someday. The steps belo
 the process to update the CA signing certificate without causing disruption or outage to the
 network. The default expiration time for Fabric CA signing certificates is as follows:
 
-Root CA certificate: 15 years
-Intermediate CA certificate: 5 years
+| Root CA certificate: 15 years
+| Intermediate CA certificate: 5 years
 
 Whether the CA signing cert is issued by Fabric CA or third party entities like Verisign,
 we need a way to update CA certs before they expire without any disruption/outage to the network.
