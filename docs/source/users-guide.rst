@@ -1119,12 +1119,11 @@ To display summary information from the haproxy "show stat" command, the followi
 Rotating the root CA's signing certificate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Certificates have expiration dates and eventually expire someday. We need a way to update
-the CA signing certificates without causing disruption or outage to the network. Default
-expiration time for Fabric CA signing certificates is as follows:
+Certificates have expiration dates and eventually expire someday. The steps below describe
+the process to update the CA signing certificate without causing disruption or outage to the
+network. The default expiration time for Fabric CA signing certificates is as follows:
 
 Root CA certificate: 15 years
-
 Intermediate CA certificate: 5 years
 
 Whether the CA signing cert is issued by Fabric CA or third party entities like Verisign,
@@ -1148,14 +1147,15 @@ signing certificate and private key, the following way:
       fabric-ca-server init –c <temp config directory>/<server config file name> --ca.name <CA Name>
 
 3) Copy CA cert and private key from <temp config directory> to the running Fabric CA server’s CA
-   config directory.
+   config directory. Rename the new certificate to match the name that matches the certificate name
+   in the fabric-ca-server-config.yaml file (default ca-cert.pem).
 
 With this method, identities with valid ECerts will not be able to perform any Fabric CA
 requests as soon as new CA cert/key is copied into Fabric CA server’s configuration directory. Such
 identities, will have to use basic authorization (username/password) to enroll again to get a
-new ECert issues signed with the new CA key.
+new ECert that is signed with the new CA key.
 
-**Rotating in a cluster environment - No HSM:**
+**Rotating in a cluster environment:**
 
 1) Bring down one cluster member
 2) Generate new CA certificate key pair (ca-new.pem) on the stopped cluster member::
@@ -1166,18 +1166,6 @@ new ECert issues signed with the new CA key.
    (cert goes into CA config directory and key goes into <CA config dir>/msp/keystore)
 4) Set ca.certfile to the new CA cert (generated in the step2) in the configuration files on all cluster members
 5) Restart cluster members one at a time
-
-**Rotating in a cluster environment - HSM:**
-
-1) Stop all but one cluster member
-2) Generate new CA certificate key pair (ca-new.pem) for iCA1 and iCA2 on the running cluster member
-3) Mark the new CA cert as the default
-4) Copy new CA cert to all cluster member’s CA config directory
-5) Start the next stopped server
-6) Generate new CA certificate key pair (ca-new.pem)
-7) Copy new CA Cert to previously started cluster members
-8) Mark the new CA cert as the default
-9) Repeat steps 4-8 for all the cluster members
 
 `Back to Top`_
 
