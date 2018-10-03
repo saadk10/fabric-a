@@ -1142,9 +1142,16 @@ If Fabric CA is used as the Certificate Authority, one can generate new root/int
 signing certificate and private key, the following way:
 
 1) Copy server configuration to a temporary config directory
-2) Run ``fabric-ca-server init`` using the temporary config directory::
+
+2) Run ``fabric-ca-server init`` using the temporary config directory
+
+    Root CA::
 
       fabric-ca-server init –c <temp config directory>/<server config file name> --ca.name <CA Name>
+
+    Intermediate CA::
+
+      fabric-ca-server init –c <temp config directory>/<server config file name> -u http://<id>:<pass>@<root_ca_address>:<root_ca_port>ectory>/<server config file name> -u http://<id>:<pass>@<root_ca_address>:<root_ca_port>
 
 3) Copy CA cert and private key from <temp config directory> to the running Fabric CA server’s CA
    config directory. Rename the new certificate to match the name that matches the certificate name
